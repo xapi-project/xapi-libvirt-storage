@@ -31,11 +31,11 @@ let features = [
   "VDI_ACTIVATE", 0L;
   "VDI_DEACTIVATE", 0L;
 ]
-let _path = "path"
+let _xml  = "xml"
 let _name = "name"
 let _uri  = "uri"
 let configuration = [
-   _path, "path in the filesystem to store disk images";
+   _xml, "XML fragment describing the storage pool configuration";
    _name, "name of the libvirt storage pool";
    _uri, "URI of the hypervisor to use";
 ]
@@ -367,15 +367,13 @@ module Implementation = struct
     let create ctx ~dbg ~sr ~device_config ~physical_size =
        let name = require device_config _name in
        let uri = optional device_config _uri in
-       let path = require device_config _path in
+       let xml = require device_config _xml in
        let xml = Printf.sprintf "
          <pool type=\"dir\">
            <name>%s</name>
-           <target>
-             <path>%s</path>
-           </target>
+           %s
          </pool>
-       " name path in
+       " name xml in
        let c = get_connection ?name:uri () in
        let _ = report_libvirt_error (Libvirt.Pool.create_xml c) xml in
        ()
