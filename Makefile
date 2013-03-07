@@ -1,14 +1,14 @@
 BINDIR?=/tmp/
 
-dist/build/ffs/ffs:
+dist/build/sm-libvirt/sm-libvirt:
 	obuild configure
 	obuild build
 
 install:
-	install -m 0755 dist/build/ffs/ffs ${BINDIR}
+	install -m 0755 dist/build/sm-libvirt/sm-libvirt ${BINDIR}
 
 uninstall:
-	rm -f ${BINDIR}/ffs
+	rm -f ${BINDIR}/sm-libvirt
 
 .PHONY: clean
 clean:
