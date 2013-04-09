@@ -319,9 +319,8 @@ module Implementation = struct
       {
         params = path;
         xenstore_data = [
-          "type", "volume";
-          "pool", sr;
-          "volume", vdi_vol_of vdi;
+          "type", "rbd";
+          "name", vdi_vol_of vdi;
         ]
       }
     let detach ctx ~dbg ~dp ~sr ~vdi =
