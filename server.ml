@@ -320,7 +320,7 @@ module Implementation = struct
         params = path;
         xenstore_data = [
           "type", "rbd";
-          "name", vdi_vol_of vdi;
+          "name", vdi;
         ]
       }
     let detach ctx ~dbg ~dp ~sr ~vdi =
