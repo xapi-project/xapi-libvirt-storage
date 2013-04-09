@@ -233,6 +233,11 @@ module Implementation = struct
       let xml = V.get_xml_desc (V.const v) in
       read_xml_path volume_target_path xml 
 
+    let vdi_vol_of key =
+      let c = get_connection () in
+      let v = V.lookup_by_key c key in
+      V.get_name (V.const v)
+
     let vdi_info_of_name pool name =
         try
           let v = V.lookup_by_name pool name in
@@ -313,7 +318,11 @@ module Implementation = struct
       let path = vdi_path_of vdi in
       {
         params = path;
-        xenstore_data = []
+        xenstore_data = [
+          "type", "volume";
+          "pool", sr;
+          "volume", vdi_vol_of vdi;
+        ]
       }
     let detach ctx ~dbg ~dp ~sr ~vdi =
       let _ = vdi_path_of vdi in
