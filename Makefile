@@ -1,8 +1,12 @@
 BINDIR?=/tmp/
 
-dist/build/sm-libvirt/sm-libvirt:
-	obuild configure
+.PHONY: build
+build: configure.done
 	obuild build
+
+configure.done: sm-libvirt.obuild
+	obuild configure
+	touch configure.done
 
 install:
 	install -m 0755 dist/build/sm-libvirt/sm-libvirt ${BINDIR}
