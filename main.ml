@@ -42,8 +42,7 @@ let main () =
   configure ~options ~resources ();
   let server = Xcp_service.make ~path:!socket_path
     ~queue_name:!Storage_interface.queue_name
-    ~raw_fn:(fun fd -> http_handler Xmlrpc.call_of_string Xmlrpc.string_of_response Server.process)
-    ~rpc_fn:Server.process in
+    ~rpc_fn:(fun s -> Server.process () s) () in
 
   Xcp_service.maybe_daemonize ();
 
