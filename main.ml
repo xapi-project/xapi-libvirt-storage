@@ -33,20 +33,20 @@ let socket_path = ref !Storage_interface.default_path
 
 let options = [
   "socket-path", Arg.Set_string socket_path, (fun () -> !socket_path), "Path of listening socket";
+  "queue-name", Arg.Set_string Storage_interface.queue_name, (fun () -> !Storage_interface.queue_name), "Name of queue to listen on";
 ]
 
 let main () =
   debug "%s version %d.%d starting" name major_version minor_version;
 
   configure ~options ~resources ();
-  let socket = listen !socket_path in
-  if !Xcp_service.daemon then daemonize ();
+  let server = Xcp_service.make ~path:!socket_path
+    ~queue_name:!Storage_interface.queue_name
+    ~raw_fn:(fun fd -> http_handler Xmlrpc.call_of_string Xmlrpc.string_of_response Server.process)
+    ~rpc_fn:Server.process in
 
-  accept_forever socket
-    (fun s ->
-      http_handler Xmlrpc.call_of_string Xmlrpc.string_of_response Server.process s ()
-    );
+  Xcp_service.maybe_daemonize ();
 
-  wait_forever ()
+  Xcp_service.serve_forever server
 
 let _ = main ()
