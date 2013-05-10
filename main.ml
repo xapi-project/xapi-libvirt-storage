@@ -32,12 +32,15 @@ let resources = [
 let socket_path = ref !Storage_interface.default_path
 
 let options = [
+  "use-switch", Arg.Set Xcp_client.use_switch, (fun () -> string_of_bool !Xcp_client.use_switch), "true if we want to use the message switch";
   "socket-path", Arg.Set_string socket_path, (fun () -> !socket_path), "Path of listening socket";
   "queue-name", Arg.Set_string Storage_interface.queue_name, (fun () -> !Storage_interface.queue_name), "Name of queue to listen on";
 ]
 
 let main () =
   debug "%s version %d.%d starting" name major_version minor_version;
+  (* The default queue name: *)
+  Storage_interface.queue_name := "org.xen.xcp.storage.libvirt";
 
   configure ~options ~resources ();
   let server = Xcp_service.make ~path:!socket_path
