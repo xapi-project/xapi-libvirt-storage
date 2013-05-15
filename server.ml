@@ -320,7 +320,7 @@ module Implementation = struct
         params = path;
         xenstore_data = [
           "type", "rbd";
-          "name", vdi;
+          "name", "rbd:" ^ vdi; (* XXX some versions of qemu require this hack *)
         ]
       }
     let detach ctx ~dbg ~dp ~sr ~vdi =
