@@ -1,0 +1,19 @@
+This software has the following dependencies:
+
+  * OCaml
+  * findlib
+  * libvirt
+  * xcp
+  * re
+  * rpc
+  * cmdliner
+  * cohttp
+  * syslog
+
+To build:
+
+    make
+
+To install:
+
+    make install
