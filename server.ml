@@ -13,6 +13,7 @@
  *)
 
 open Xcp_service
+open Common
 
 let driver = "libvirt"
 let name = "sm-libvirt"
@@ -40,9 +41,6 @@ let configuration = [
 let json_suffix = ".json"
 let state_path = Printf.sprintf "/var/run/nonpersistent/%s%s" name json_suffix
 
-module D = Debug.Make(struct let name = "ffs" end)
-open D
-
 module C = Libvirt.Connect
 module P = Libvirt.Pool
 module V = Libvirt.Volume
@@ -59,42 +57,6 @@ let get_connection ?name () = match !conn with
 type sr = {
   pool: Libvirt.rw P.t;
 }
-
-let finally f g =
-  try
-    let result = f () in
-    g ();
-    result
-  with e ->
-    g ();
-    raise e
-
-let startswith prefix x =
-  let prefix' = String.length prefix in
-  let x' = String.length x in
-  x' >= prefix' && (String.sub x 0 prefix' = prefix)
-
-let remove_prefix prefix x =
-  let prefix' = String.length prefix in
-  let x' = String.length x in
-  String.sub x prefix' (x' - prefix')
-
-let endswith suffix x =
-  let suffix' = String.length suffix in
-  let x' = String.length x in
-  x' >= suffix' && (String.sub x (x' - suffix') suffix' = suffix)
-
-let iso8601_of_float x = 
-  let time = Unix.gmtime x in
-  Printf.sprintf "%04d%02d%02dT%02d:%02d:%02dZ"
-    (time.Unix.tm_year+1900)
-    (time.Unix.tm_mon+1)
-    time.Unix.tm_mday
-    time.Unix.tm_hour
-    time.Unix.tm_min
-    time.Unix.tm_sec
-
-let ( |> ) a b = b a
 
 open Storage_interface
 
