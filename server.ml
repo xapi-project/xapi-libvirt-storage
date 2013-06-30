@@ -69,40 +69,6 @@ let finally f g =
     g ();
     raise e
 
-let string_of_file filename =
-  let ic = open_in filename in
-  let output = Buffer.create 1024 in
-  try
-    while true do
-      let block = String.make 4096 '\000' in
-      let n = input ic block 0 (String.length block) in
-      if n = 0 then raise End_of_file;
-      Buffer.add_substring output block 0 n
-    done;
-    "" (* never happens *)
-  with End_of_file ->
-    close_in ic;
-    Buffer.contents output
-
-let file_of_string filename string =
-  let oc = open_out filename in
-  finally
-    (fun () ->
-      debug "write >%s %s" filename string;
-      output oc string 0 (String.length string)
-    ) (fun () -> close_out oc)
-
-let run cmd =
-  info "shell %s" cmd;
-  let f = Filename.temp_file name name in
-  let cmdline = Printf.sprintf "%s > %s 2>&1" cmd f in
-  let code = Sys.command cmdline in
-  let output = string_of_file f in
-  let _ = Sys.command (Printf.sprintf "rm %s" f) in
-  if code = 0
-  then output
-  else failwith (Printf.sprintf "%s: %d: %s" cmdline code output)
-
 let startswith prefix x =
   let prefix' = String.length prefix in
   let x' = String.length x in
