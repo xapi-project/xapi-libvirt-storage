@@ -1,3 +1,6 @@
+0.9.2 (30-Jun-2013):
+* libvirt ceph storage now works
+
 0.9.1 (30-Jun-2013):
 * now takes entire libvirt storage pool XML fragments in SR attach, create
 * SR.attach is now idempotent
