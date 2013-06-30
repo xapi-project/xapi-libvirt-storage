@@ -76,3 +76,14 @@ let iso8601_of_float x =
 
 let ( |> ) a b = b a
 
+(** create a directory, and create parent if doesn't exist *)
+let mkdir_rec dir perm =
+  let mkdir_safe dir perm =
+    try Unix.mkdir dir perm with Unix.Unix_error (Unix.EEXIST, _, _) -> () in
+  let rec p_mkdir dir =
+    let p_name = Filename.dirname dir in
+    if p_name <> "/" && p_name <> "." 
+    then p_mkdir p_name;
+    mkdir_safe dir perm in
+  p_mkdir dir
+

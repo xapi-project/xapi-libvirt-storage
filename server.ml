@@ -37,24 +37,36 @@ let configuration = [
    _uri, "URI of the hypervisor to use";
 ]
 
+let json_suffix = ".json"
+let state_path = Printf.sprintf "/var/run/nonpersistent/%s%s" name json_suffix
+
 module C = Libvirt.Connect
 module P = Libvirt.Pool
 module V = Libvirt.Volume
 
 let conn = ref None
+let conn_uri = ref None
 
 let get_connection ?name () = match !conn with
   | None ->
     let c = C.connect ?name () in
     conn := Some c;
+    conn_uri := name;
     c
   | Some c -> c
+
+open Storage_interface
+
+let report_libvirt_error f x =
+  try
+    f x
+  with Libvirt.Virterror t ->
+    error "from libvirt: %s" (Libvirt.Virterror.to_string t);
+    raise (Backend_error ("libvirt", [Libvirt.Virterror.to_string t]))
 
 type sr = {
   pool: Libvirt.rw P.t;
 }
-
-open Storage_interface
 
 module Attached_srs = struct
   let table = Hashtbl.create 16
@@ -73,12 +85,56 @@ module Attached_srs = struct
   let num_attached () = Hashtbl.fold (fun _ _ acc -> acc + 1) table 0
 end
 
-let report_libvirt_error f x =
-  try
-    f x
-  with Libvirt.Virterror t ->
-    error "from libvirt: %s" (Libvirt.Virterror.to_string t);
-    raise (Backend_error ("libvirt", [Libvirt.Virterror.to_string t]))
+let create_or_attach (sr, xml) =
+  let c = get_connection () in
+  let name = read_xml_path name_pool xml in
+  let pool =
+    try
+      P.lookup_by_name c name
+    with e ->
+      info "Failed to discover existing storage pool '%s': attempting to create" name;
+      report_libvirt_error (Libvirt.Pool.create_xml c) xml in
+  Attached_srs.put sr { pool }
+
+module State = struct
+  (** Store the currently attached SRs, so we can reconnect over a service restart *)
+
+  type state = {
+    uri: string option;
+    srs: (string * string) list;
+  } with rpc
+
+  let srs : (string * string) list ref = ref []
+
+  let save () =
+    let txt = Jsonrpc.to_string (rpc_of_state { uri = !conn_uri; srs = !srs }) in
+    let dir = Filename.dirname state_path in
+    if not(Sys.file_exists dir)
+    then mkdir_rec dir 0o0755;
+    file_of_string state_path txt
+  let load () =
+    if Sys.file_exists state_path then begin
+      info "Loading state from: %s" state_path;
+      let t = state_of_rpc (Jsonrpc.of_string (string_of_file state_path)) in
+      begin match t.uri with
+      | Some name -> ignore(get_connection ~name ())
+      | None -> ()
+      end;
+      List.iter create_or_attach t.srs
+    end else info "No saved state; starting with an empty configuration"
+
+  (* On service start, load any existing database *)
+  let _ = load ()
+
+  let add (name, xml) =
+    srs := (name, xml) :: !srs;
+    save ()
+
+  let remove name =
+    srs := List.filter (fun (n, _) -> n <> name) !srs;
+    save ()
+end
+
 
 
 module Implementation = struct
@@ -235,6 +291,7 @@ module Implementation = struct
     let destroy = destroy
     let reset = reset
     let detach ctx ~dbg ~sr =
+       State.remove sr;
        Attached_srs.remove sr;
        if Attached_srs.num_attached () = 0
        then match !conn with
@@ -257,15 +314,10 @@ module Implementation = struct
     let attach ctx ~dbg ~sr ~device_config =
        let xml = require device_config _xml in
        let uri = optional device_config _uri in
-       let c = get_connection ?name:uri () in
+       let _ = get_connection ?name:uri () in
        let name = read_xml_path name_pool xml in
-       let pool =
-         try
-           P.lookup_by_name c name
-         with e ->
-           info "Failed to discover existing storage pool '%s': attempting to create" name;
-           report_libvirt_error (Libvirt.Pool.create_xml c) xml in
-       Attached_srs.put sr { pool }
+       create_or_attach (sr, xml);
+       State.add (name, xml)
 
     let create ctx ~dbg ~sr ~device_config ~physical_size =
        (* Sometimes an active storage pool disappears from libvirt's list.
