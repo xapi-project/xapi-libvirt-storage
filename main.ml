@@ -13,21 +13,9 @@
  *)
 
 open Xcp_service
-module D = Debug.Make(struct let name = "ffs" end)
-open D
+open Common
 
 open Server
-
-let losetup = ref "/sbin/losetup"
-
-let resources = [
-  { Xcp_service.name = "losetup";
-    description = "used to set up loopback block devices";
-    essential = true;
-    path = losetup;
-    perms = [ Unix.X_OK ];
-  }
-]
 
 let socket_path = ref !Storage_interface.default_path
 
@@ -42,7 +30,7 @@ let main () =
   (* The default queue name: *)
   Storage_interface.queue_name := "org.xen.xcp.storage.libvirt";
 
-  configure ~options ~resources ();
+  configure ~options ();
   let server = Xcp_service.make ~path:!socket_path
     ~queue_name:!Storage_interface.queue_name
     ~rpc_fn:(fun s -> Server.process () s) () in
