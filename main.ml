@@ -38,7 +38,7 @@ let options = [
 ]
 
 let main () =
-  debug "%s version %d.%d starting" name major_version minor_version;
+  debug "%s version %s starting" name Version.version;
   (* The default queue name: *)
   Storage_interface.queue_name := "org.xen.xcp.storage.libvirt";
 
