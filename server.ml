@@ -75,13 +75,11 @@ module Attached_srs = struct
     then raise (Sr_not_attached id)
     else Hashtbl.find table id
   let put id sr =
-    if Hashtbl.mem table id
-    then raise (Sr_attached id)
-    else Hashtbl.replace table id sr
+    (* We won't fail if the SR already attached. FIXME What if the user attempts
+       to attach us twice with different configuration? *)
+    Hashtbl.replace table id sr
   let remove id =
-    if not(Hashtbl.mem table id)
-    then raise (Sr_not_attached id)
-    else Hashtbl.remove table id
+    Hashtbl.remove table id
   let num_attached () = Hashtbl.fold (fun _ _ acc -> acc + 1) table 0
 end
 
