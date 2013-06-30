@@ -14,6 +14,7 @@
 
 open Xcp_service
 open Common
+open Xml
 
 let driver = "libvirt"
 let name = "sm-libvirt"
@@ -119,38 +120,6 @@ module Implementation = struct
     let remove_from_sm_config = remove_from_sm_config
     let set_content_id = set_content_id
     let get_by_name = get_by_name
-
-    let example_volume_xml = "
-       <volume>
-         <name>myvol</name>
-         <key>rbd/myvol</key>
-         <source>
-         </source>
-         <capacity unit='bytes'>53687091200</capacity>
-         <allocation unit='bytes'>53687091200</allocation>
-         <target>
-           <path>rbd:rbd/myvol</path>
-           <format type='unknown'/>
-           <permissions>
-             <mode>00</mode>
-             <owner>0</owner>
-             <group>0</group>
-           </permissions>
-         </target>
-       </volume>
-    "
-    
-    let read_xml_path path' xml =
-      let input = Xmlm.make_input (`String (0, xml)) in
-      let rec search path = match Xmlm.input input with
-      | `Dtd _ -> search path
-      | `El_start ((_, x), _) -> search (x :: path)
-      | `El_end -> search (List.tl path)
-      | `Data x when path = path' -> x
-      | `Data _ -> search path in
-      search []
-
-    let volume_target_path = [ "path"; "target"; "volume" ]
 
     let vdi_path_of key =
       let c = get_connection () in
