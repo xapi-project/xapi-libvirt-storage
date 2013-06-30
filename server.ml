@@ -268,7 +268,7 @@ module Implementation = struct
     let attach ctx ~dbg ~dp ~sr ~vdi ~read_write =
       let path = vdi_path_of vdi in
       {
-        params = path;
+        params = "rbd:" ^ path; (* XXX some versions of qemu require this hack *)
         xenstore_data = [
           "type", "rbd";
           "name", "rbd:" ^ vdi; (* XXX some versions of qemu require this hack *)
