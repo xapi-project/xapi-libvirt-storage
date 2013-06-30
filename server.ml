@@ -256,7 +256,15 @@ module Implementation = struct
       let v = V.lookup_by_path c vdi in
       report_libvirt_error (V.delete v) V.Normal
 
-    let stat ctx ~dbg ~sr ~vdi = assert false
+    let stat ctx ~dbg ~sr ~vdi =
+      let sr = Attached_srs.get sr in
+      let c = get_connection () in
+      let v = V.const (V.lookup_by_path c vdi) in
+      match vdi_info_of_name (P.const sr.pool) (V.get_name v) with
+      | None ->
+        failwith (Printf.sprintf "VDI does not exist: %s" vdi)
+      | Some x -> x
+
     let attach ctx ~dbg ~dp ~sr ~vdi ~read_write =
       let path = vdi_path_of vdi in
       {
@@ -313,9 +321,8 @@ module Implementation = struct
        let xml = require device_config _xml in
        let uri = optional device_config _uri in
        let _ = get_connection ?name:uri () in
-       let name = read_xml_path name_pool xml in
        create_or_attach (sr, xml);
-       State.add (name, xml)
+       State.add (sr, xml)
 
     let create ctx ~dbg ~sr ~device_config ~physical_size =
        (* Sometimes an active storage pool disappears from libvirt's list.
