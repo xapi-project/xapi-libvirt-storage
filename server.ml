@@ -17,7 +17,7 @@ open Common
 open Xml
 
 let driver = "libvirt"
-let name = "sm-libvirt"
+let name = Filename.basename Sys.argv.(0)
 let description = "xapi libvirt storage connector"
 let vendor = "Citrix"
 let copyright = "Citrix Inc"
@@ -31,16 +31,11 @@ let features = [
   "VDI_DEACTIVATE", 0L;
 ]
 let _xml  = "xml"
-let _name = "name"
 let _uri  = "uri"
 let configuration = [
    _xml, "XML fragment describing the storage pool configuration";
-   _name, "name of the libvirt storage pool";
    _uri, "URI of the hypervisor to use";
 ]
-
-let json_suffix = ".json"
-let state_path = Printf.sprintf "/var/run/nonpersistent/%s%s" name json_suffix
 
 module C = Libvirt.Connect
 module P = Libvirt.Pool
@@ -260,25 +255,22 @@ module Implementation = struct
 
 
     let attach ctx ~dbg ~sr ~device_config =
-       let name = require device_config _name in
+       let xml = require device_config _xml in
        let uri = optional device_config _uri in
        let c = get_connection ?name:uri () in
-       let pool = P.lookup_by_name c name in
+       let name = read_xml_path name_pool xml in
+       let pool =
+         try
+           P.lookup_by_name c name
+         with e ->
+           info "Failed to discover existing storage pool '%s': attempting to create" name;
+           report_libvirt_error (Libvirt.Pool.create_xml c) xml in
        Attached_srs.put sr { pool }
 
     let create ctx ~dbg ~sr ~device_config ~physical_size =
-       let name = require device_config _name in
-       let uri = optional device_config _uri in
-       let xml = require device_config _xml in
-       let xml = Printf.sprintf "
-         <pool type=\"dir\">
-           <name>%s</name>
-           %s
-         </pool>
-       " name xml in
-       let c = get_connection ?name:uri () in
-       let _ = report_libvirt_error (Libvirt.Pool.create_xml c) xml in
-       ()
+       (* Sometimes an active storage pool disappears from libvirt's list.
+          We make 'attach' mean 'attach if existing, re-create if missing' *)
+       attach ctx ~dbg ~sr ~device_config
   end
   module UPDATES = struct include Storage_skeleton.UPDATES end
   module TASK = struct include Storage_skeleton.TASK end

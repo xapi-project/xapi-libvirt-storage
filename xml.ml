@@ -55,3 +55,5 @@ let read_xml_path path' xml =
   search []
 
 let volume_target_path = [ "path"; "target"; "volume" ]
+
+let name_pool = [ "name"; "pool" ]
