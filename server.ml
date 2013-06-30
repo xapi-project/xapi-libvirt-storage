@@ -16,7 +16,7 @@ open Xcp_service
 
 let driver = "libvirt"
 let name = "sm-libvirt"
-let description = "XCP -> libvirt storage connector"
+let description = "xapi libvirt storage connector"
 let vendor = "Citrix"
 let copyright = "Citrix Inc"
 let required_api_version = "2.0"
