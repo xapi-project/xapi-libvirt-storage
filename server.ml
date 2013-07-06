@@ -283,6 +283,14 @@ module Implementation = struct
   module SR = struct
     open Storage_skeleton.SR
     let list = list
+    let stat ctx ~dbg ~sr =
+       let sr = Attached_srs.get sr in
+       let pool = Libvirt.Pool.const sr.pool in
+       let info = Libvirt.Pool.get_info pool in
+       let total_space = info.Libvirt.Pool.capacity in
+       let free_space = info.Libvirt.Pool.available in
+       { total_space; free_space }
+
     let scan ctx ~dbg ~sr =
        let sr = Attached_srs.get sr in
        let pool = Libvirt.Pool.const sr.pool in
