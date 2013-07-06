@@ -1,3 +1,6 @@
+0.9.3 (6-Jul-2013):
+* SR.stat now works (so size reporting via xapi works)
+
 0.9.2 (30-Jun-2013):
 * libvirt ceph storage now works
 
