@@ -1,3 +1,6 @@
+0.9.4 (8-Jul-2013):
+* add a stub for VDI.resize
+
 0.9.3 (6-Jul-2013):
 * SR.stat now works (so size reporting via xapi works)
 
