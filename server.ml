@@ -169,6 +169,7 @@ module Implementation = struct
     let remove_from_sm_config = remove_from_sm_config
     let set_content_id = set_content_id
     let get_by_name = get_by_name
+    let resize = resize
 
     let vdi_path_of key =
       let c = get_connection () in
