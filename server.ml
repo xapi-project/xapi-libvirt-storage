@@ -295,6 +295,7 @@ module Implementation = struct
     let scan ctx ~dbg ~sr =
        let sr = Attached_srs.get sr in
        let pool = Libvirt.Pool.const sr.pool in
+       Libvirt.Pool.refresh pool;
        let count = Libvirt.Pool.num_of_volumes pool in
        report_libvirt_error (Libvirt.Pool.list_volumes pool) count
        |> Array.to_list
