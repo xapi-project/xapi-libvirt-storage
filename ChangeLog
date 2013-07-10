@@ -1,3 +1,7 @@
+0.9.5 (10-Jul-2013):
+* SR.scan should now pick up new RBD volumes by calling
+  a libvirt pool-refresh
+
 0.9.4 (8-Jul-2013):
 * add a stub for VDI.resize
 
