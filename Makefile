@@ -2,20 +2,20 @@ BINDIR?=/tmp/
 
 .PHONY: build install uninstall clean
 
-build: dist/setup version.ml
-	obuild build
+build: setup.data version.ml
+	ocaml setup.ml -build
+
+setup.data: _oasis
+	ocaml setup.ml -configure
 
 version.ml: VERSION
 	echo "let version = \"$(shell cat VERSION)\"" > version.ml
 
-dist/setup: sm-libvirt.obuild
-	obuild configure
-
 install:
-	install -m 0755 dist/build/sm-libvirt/sm-libvirt ${BINDIR}
+	install -m 0755 main.native ${BINDIR}/sm-libvirt
 
 uninstall:
 	rm -f ${BINDIR}/sm-libvirt
 
 clean:
-	rm -rf dist
+	ocaml setup.ml -clean

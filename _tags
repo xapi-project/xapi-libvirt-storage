@@ -1,0 +1,32 @@
+# OASIS_START
+# DO NOT EDIT (digest: e6c4fc2c1d9dde655b22e7c95ddb3053)
+# Ignore VCS directories, you can use the same kind of rule outside
+# OASIS_START/STOP if you want to exclude directories that contains
+# useless stuff for the build process
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Executable sm_libvirt
+<main.{native,byte}>: pkg_cmdliner
+<main.{native,byte}>: pkg_libvirt
+<main.{native,byte}>: pkg_re
+<main.{native,byte}>: pkg_rpclib.syntax
+<main.{native,byte}>: pkg_threads
+<main.{native,byte}>: pkg_xcp
+<main.{native,byte}>: pkg_xcp.storage
+<*.ml{,i}>: pkg_cmdliner
+<*.ml{,i}>: pkg_libvirt
+<*.ml{,i}>: pkg_re
+<*.ml{,i}>: pkg_rpclib.syntax
+<*.ml{,i}>: pkg_threads
+<*.ml{,i}>: pkg_xcp
+<*.ml{,i}>: pkg_xcp.storage
+# OASIS_STOP
+<server.ml>: syntax_camlp4o, pkg_rpc.syntax
