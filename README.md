@@ -1,3 +1,5 @@
+[![Build stats](https://travis-ci.org/xapi-project/xapi-libvirt-storage.png?branch=master)](https://travis-ci.org/xapi-project/xapi-libvirt-storage)
+
 An xapi storage adapter which uses libvirt
 ------------------------------------------
 
