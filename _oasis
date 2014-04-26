@@ -1,0 +1,15 @@
+OASISFormat: 0.2
+Name:        xapi-libvirt-storage
+Version:     0.9.7
+Synopsis:    xapi to libvirt storage adapter
+Authors:     David Scott
+License:     LGPL-2.1 with OCaml linking exception
+Plugins:     META (0.2)
+BuildTools:  ocamlbuild
+
+Executable sm_libvirt
+  CompiledObject:     best
+  Path:               .
+  MainIs:             main.ml
+  Install:            false
+  BuildDepends:       xcp, xcp.storage, cmdliner, re, libvirt, rpclib.syntax, threads

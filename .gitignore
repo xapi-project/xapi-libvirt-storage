@@ -1,3 +1,5 @@
 version.ml
-dist
-configure.done
+setup.data
+setup.log
+_build
+main.native
