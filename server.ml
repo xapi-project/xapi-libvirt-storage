@@ -283,6 +283,7 @@ module Implementation = struct
   end
   module SR = struct
     open Storage_skeleton.SR
+    let probe = probe
     let list = list
     let update_snapshot_info_src = update_snapshot_info_src
     let update_snapshot_info_dest = update_snapshot_info_dest
