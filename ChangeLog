@@ -1,3 +1,6 @@
+0.10.0 (7-Apr-2015):
+* update to xapi-idl.0.10.0
+
 0.9.7 (25-Sep-2013):
 * use syslog from xcp-idl
 
