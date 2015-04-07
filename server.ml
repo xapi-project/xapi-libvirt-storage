@@ -273,7 +273,9 @@ module Implementation = struct
         xenstore_data = [
           "type", "rbd";
           "name", "rbd:" ^ vdi; (* XXX some versions of qemu require this hack *)
-        ]
+        ];
+        o_direct = true;
+        o_direct_reason = "";
       }
     let detach ctx ~dbg ~dp ~sr ~vdi =
       let _ = vdi_path_of vdi in

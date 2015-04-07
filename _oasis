@@ -1,6 +1,6 @@
 OASISFormat: 0.2
 Name:        xapi-libvirt-storage
-Version:     0.9.7
+Version:     0.10.0
 Synopsis:    xapi to libvirt storage adapter
 Authors:     David Scott
 License:     LGPL-2.1 with OCaml linking exception
